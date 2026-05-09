@@ -1,13 +1,13 @@
-require('dotenv').config();
-const mysql = require('mysql2/promise');
+import 'dotenv/config';
+import mysql from 'mysql2/promise';
 
-let pool = mysql.createPool({
+const dataBaseConfig = {
   // 数据库连接配置 - 支持环境变量覆盖
-  host: process.env.DB_HOST || 'localhost',      // 数据库主机地址
-  port: process.env.DB_PORT || 3306,             // 数据库端口号
-  user: process.env.DB_USER || 'root',           // 数据库用户名
-  password: process.env.DB_PASSWORD || '123456', // 数据库密码
-  database: process.env.DB_NAME || 'demo',       // 数据库名称
+  host: process.env.DB_HOST,      // 数据库主机地址
+  port: parseInt(process.env.DB_PORT || '3306'), // 数据库端口号
+  user: process.env.DB_USER,           // 数据库用户名
+  password: process.env.DB_PASSWORD, // 数据库密码
+  database: process.env.DB_NAME,       // 数据库名称
 
   // 字符集配置
   charset: 'utf8mb4',
@@ -27,7 +27,8 @@ let pool = mysql.createPool({
   // 连接保活配置
   enableKeepAlive: true,     // 启用TCP连接保活
   keepAliveInitialDelay: 10000  // 保活探测延迟（毫秒）
-});
+}
+const pool = mysql.createPool(dataBaseConfig);
 
 /**
  * mysql 增删改查
@@ -35,9 +36,9 @@ let pool = mysql.createPool({
  * @param {Array} params 参数数组，用于防止SQL注入
  * @param {Number} timeout 查询超时时间（毫秒），默认 30000
  */
-async function query (sql, params = [], timeout = 30000) {
+export async function dbQuery(sql: string, params: any[] = [], timeout: number = 30000): Promise<any> {
   const connection = await pool.getConnection();
-  let timeoutId = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let isTimedOut = false;
 
   const timeoutPromise = new Promise((_, reject) => {
@@ -50,11 +51,11 @@ async function query (sql, params = [], timeout = 30000) {
 
   try {
     const queryPromise = connection.query(sql, params);
-    const [result] = await Promise.race([queryPromise, timeoutPromise]);
-    clearTimeout(timeoutId);
+    const [result] = await Promise.race([queryPromise, timeoutPromise]) as any;
+    if (timeoutId) clearTimeout(timeoutId);
     return result;
   } catch (err) {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
     if (isTimedOut) {
       throw err; // 已经处理过超时错误
     }
@@ -71,12 +72,15 @@ async function query (sql, params = [], timeout = 30000) {
  * @param {Array} queries 查询数组，每项包含 sql 和 params
  * @param {Number} timeout 单次查询超时时间（毫秒），默认 30000
  */
-async function transaction (queries, timeout = 30000) {
+export async function dbTransaction(
+  queries: Array<{ sql: string; params?: any[] }>,
+  timeout: number = 30000
+): Promise<any[]> {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
 
-    const results = [];
+    const results: any[] = [];
     for (const { sql, params = [] } of queries) {
       const [result] = await queryWithTimeout(connection, sql, params, timeout);
       results.push(result);
@@ -99,8 +103,13 @@ async function transaction (queries, timeout = 30000) {
  * @param {Array} params 参数数组
  * @param {Number} timeout 超时时间
  */
-async function queryWithTimeout (connection, sql, params, timeout) {
-  let timeoutId = null;
+async function queryWithTimeout(
+  connection: mysql.PoolConnection,
+  sql: string,
+  params: any[],
+  timeout: number
+): Promise<[any]> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let isTimedOut = false;
 
   const timeoutPromise = new Promise((_, reject) => {
@@ -113,11 +122,11 @@ async function queryWithTimeout (connection, sql, params, timeout) {
 
   try {
     const queryPromise = connection.query(sql, params);
-    const [result] = await Promise.race([queryPromise, timeoutPromise]);
-    clearTimeout(timeoutId);
-    return [result];
+    const result = await Promise.race([queryPromise, timeoutPromise]) as any;
+    if (timeoutId) clearTimeout(timeoutId);
+    return result;
   } catch (err) {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
     throw err;
   } finally {
     // noop - 连接由调用方管理
@@ -127,8 +136,3 @@ async function queryWithTimeout (connection, sql, params, timeout) {
 // 优雅关闭 - 进程退出时自动关闭连接池
 process.on('SIGINT', () => pool.end().then(() => process.exit(0)));
 process.on('SIGTERM', () => pool.end().then(() => process.exit(0)));
-
-module.exports = {
-  query,
-  transaction
-}

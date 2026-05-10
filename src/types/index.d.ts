@@ -3,11 +3,11 @@
  */
 export interface ResponseBody {
   // 状态码，200 为成功，其他为失败
-  code: number;
+  code: number
   // 操作结果描述
-  msg: string;
+  msg: string
   // 返回数据
-  data: any;
+  data: any
 }
 
 /**
@@ -15,11 +15,11 @@ export interface ResponseBody {
  */
 export interface TokenCheckResult {
   // Token 是否有效
-  istrue: boolean;
+  istrue: boolean
   // 可选的用户 ID
-  id?: number;
+  id?: number
   // 可选的用户密码
-  password?: string;
+  password?: string
   // 可选的用户角色
-  role?: number;
+  role?: number
 }

@@ -7,7 +7,12 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "tsx src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\" --no-error-on-unmatched-pattern",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\" --no-error-on-unmatched-pattern --fix",
+    "format": "prettier --check \"src/**/*.{ts,tsx,js,jsx,vue,json,md}\"",
+    "format:write": "prettier --write \"src/**/*.{ts,tsx,js,jsx,vue,json,md}\""
   },
   "author": "nul",
   "license": "ISC",
@@ -24,10 +29,21 @@
     "mysql2": "^3.6.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/koa": "^2.13.5",
     "@types/koa-router": "^7.4.2",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-vue": "^9.33.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
     "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vue-eslint-parser": "^9.4.3"
   }
 }

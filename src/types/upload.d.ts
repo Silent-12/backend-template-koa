@@ -3,7 +3,7 @@
  */
 export interface UploadFile {
   // 上传后的新文件名
-  newFilename: string;
+  newFilename: string
   // 文件的 MIME 类型
-  mimetype: string;
+  mimetype: string
 }

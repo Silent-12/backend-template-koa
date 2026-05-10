@@ -1,5 +1,6 @@
 import 'dotenv/config'
-import Koa, { Context, Next } from 'koa'
+import type { Context, Next } from 'koa'
+import Koa from 'koa'
 import cors from '@koa/cors'
 import koaStatic from 'koa-static'
 import { koaBody } from 'koa-body'

@@ -7,7 +7,7 @@ export interface ResponseBody {
   // 操作结果描述
   msg: string
   // 返回数据
-  data: any
+  data: Record<string, any>
 }
 
 /**

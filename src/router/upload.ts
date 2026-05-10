@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import { Context } from 'koa'
+import type { Context } from 'koa'
 import { dbQuery } from '../utils/db'
 import { logError, bakcBody, checkFileType } from '../utils/tool'
 import type { UploadFile } from '../types/upload.d'

@@ -102,6 +102,7 @@ export async function dbTransaction(queries: Array<{ sql: string; params?: any[]
  */
 async function queryWithTimeout(connection: mysql.PoolConnection, sql: string, params: any[], timeout: number): Promise<[any]> {
   let timeoutId: ReturnType<typeof setTimeout> | null = null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let isTimedOut = false
 
   const timeoutPromise = new Promise((_, reject) => {

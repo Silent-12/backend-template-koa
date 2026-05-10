@@ -66,14 +66,14 @@
 - `.husky/pre-commit`
   - 先执行：`npm run lint`
   - 再执行：`npm run format:write`
-  - 最后自动 `git add backend/src sdk/src`
+  - 最后自动 `git add .`
 - `.husky/commit-msg`
-  - 执行：`commitlint --edit "$1"`
+  - 执行：`npx commitlint --edit "$1"`
   - 不符合提交规范将阻止提交
 
-## 5. 迁移到其他项目清单（仅迁移配置文件）
+## 4. 迁移到其他项目清单
 
-你当前约束是：**只迁移以下 5 个文件，不迁移** **`package.json`**。
+你当前约束是：**只迁移以下 5 个配置文件，不迁移** **`package.json`**。
 
 - `.eslintrc.js`
 - `.eslintignore`
@@ -89,14 +89,20 @@
 npm i -D eslint@8.57.1 @typescript-eslint/parser@7.18.0 @typescript-eslint/eslint-plugin@7.18.0 eslint-config-prettier@10.1.8 eslint-plugin-react-hooks@7.0.1 eslint-plugin-vue@9.33.0 vue-eslint-parser@9.4.3 prettier@3.6.2 @commitlint/cli@19.8.1 @commitlint/config-conventional@19.8.1 husky@9.1.7
 ```
 
-### 4.2 不迁移 `package.json` 时的执行命令
+### 4.2 在 package.json 中添加 npm scripts
 
-不依赖 npm scripts，直接执行：
+安装依赖后，需要在目标项目的 `package.json` 中添加以下脚本：
 
-```bash
-npx eslint "src/**/*.{ts,tsx,js,jsx,vue}" --no-error-on-unmatched-pattern
-npx prettier --check "src/**/*.{ts,tsx,js,jsx,vue,json,md}"
-npx prettier --write "src/**/*.{ts,tsx,js,jsx,vue,json,md}"
+```json
+{
+  "scripts": {
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\" --no-error-on-unmatched-pattern",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\" --no-error-on-unmatched-pattern --fix",
+    "format": "prettier --check \"src/**/*.{ts,tsx,js,jsx,vue,json,md}\"",
+    "format:write": "prettier --write \"src/**/*.{ts,tsx,js,jsx,vue,json,md}\"",
+    "prepare": "husky"
+  }
+}
 ```
 
 ### 4.3 Git Hooks（手动创建）
@@ -110,8 +116,8 @@ npx husky init
 然后创建（或覆盖）：
 
 - `.husky/pre-commit`
-  - `npx eslint "src/**/*.{ts,tsx,js,jsx,vue}" --no-error-on-unmatched-pattern`
-  - `npx prettier --write "src/**/*.{ts,tsx,js,jsx,vue,json,md}"`
+  - `npm run lint`
+  - `npm run format:write`
   - `git add .`
 - `.husky/commit-msg`
   - `npx commitlint --edit "$1"`
@@ -121,16 +127,16 @@ npx husky init
 按以下顺序执行即可（无需 AI 参与）：
 
 1. 复制 5 个配置文件到目标项目根目录。
-2. 安装 5.1 中的全部依赖（精确版本）。
-3. 执行 `npx husky init` 初始化 hooks。
-4. 创建 `.husky/pre-commit`（先 eslint，再 prettier --write，最后 `git add .`）。
-5. 创建 `.husky/commit-msg`（`npx commitlint --edit "$1"`）。
-6. 执行以下命令确认生效：
+2. 安装 4.1 中的全部依赖（精确版本）。
+3. 在 `package.json` 中添加 4.2 中的 npm scripts。
+4. 执行 `npx husky init` 初始化 hooks。
+5. 创建 `.husky/pre-commit`（先 `npm run lint`，再 `npm run format:write`，最后 `git add .`）。
+6. 创建 `.husky/commit-msg`（`npx commitlint --edit "$1"`）。
+7. 执行以下命令确认生效：
 
 ```bash
-npx eslint "src/**/*.{ts,tsx,js,jsx,vue}" --no-error-on-unmatched-pattern
-npx prettier --check "src/**/*.{ts,tsx,js,jsx,vue,json,md}"
+npm run lint
+npm run format
 ```
 
 <br />
-

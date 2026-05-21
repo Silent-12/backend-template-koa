@@ -1,5 +1,5 @@
 {
-  "name": "service",
+  "name": "backend-template-koa",
   "version": "1.0.0",
   "description": "koa + mysql",
   "main": "dist/app.js",
